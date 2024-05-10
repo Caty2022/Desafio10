@@ -5,6 +5,7 @@ const cartRepository = new CartRepository();
 const ProductRepository = require("../repositories/product.repository.js");
 const productRepository = new ProductRepository();
 const { generateUniqueCode, calcularTotal } = require("../utils/cartutils.js");
+const { logger } = require("../config/logger.config.js");
 
 class CartController {
   async nuevoCarrito(req, res) {
@@ -12,7 +13,8 @@ class CartController {
       const nuevoCarrito = await cartRepository.crearCarrito();
       res.json(nuevoCarrito);
     } catch (error) {
-      res.status(500).send("Error");
+      logger.error("Error al crear un nuevo carrito:", error);
+      res.status(500).send("Error al crear un nuevo carrito");
     }
   }
 
@@ -27,7 +29,8 @@ class CartController {
       }
       res.json(productos);
     } catch (error) {
-      res.status(500).send("Error");
+      logger.error("Error al obtener productos del carrito:", error);
+      res.status(500).send("Error al obtener productos del carrito");
     }
   }
 
@@ -41,7 +44,8 @@ class CartController {
 
       res.redirect(`/carts/${carritoID}`);
     } catch (error) {
-      res.status(500).send("Error");
+      logger.error("Error al agregar producto al carrito:", error);
+      res.status(500).send("Error al agregar producto al carrito");
     }
   }
 
@@ -59,7 +63,8 @@ class CartController {
         updatedCart,
       });
     } catch (error) {
-      res.status(500).send("Error");
+      logger.error("Error al eliminar producto del carrito:", error);
+      res.status(500).send("Error al eliminar producto del carrito");
     }
   }
 
@@ -74,7 +79,8 @@ class CartController {
       );
       res.json(updatedCart);
     } catch (error) {
-      res.status(500).send("Error");
+      logger.error("Error al actualizar productos en el carrito:", error);
+      res.status(500).send("Error al actualizar productos en el carrito");
     }
   }
 
@@ -95,7 +101,13 @@ class CartController {
         updatedCart,
       });
     } catch (error) {
-      res.status(500).send("Error al actualizar la cantidad de productos");
+      logger.error(
+        "Error al actualizar la cantidad de productos en el carrito:",
+        error
+      );
+      res
+        .status(500)
+        .send("Error al actualizar la cantidad de productos en el carrito");
     }
   }
 
@@ -111,7 +123,8 @@ class CartController {
         updatedCart,
       });
     } catch (error) {
-      res.status(500).send("Error");
+      logger.error("Error al vaciar el carrito:", error);
+      res.status(500).send("Error al vaciar el carrito");
     }
   }
 
@@ -163,7 +176,7 @@ class CartController {
 
       res.status(200).json({ productosNoDisponibles });
     } catch (error) {
-      console.error("Error al procesar la compra:", error);
+      logger.error("Error al procesar la compra:", error);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   }

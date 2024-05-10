@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const { createHash, isValidPassword } = require("../utils/hashbcryp.js");
 const UserDTO = require("../dto/user.dto.js");
 const passport = require("passport");
+const { logger } = require("../config/logger.config.js"); // Importar el logger
 
 class UserController {
   async register(req, res) {
@@ -14,7 +15,7 @@ class UserController {
         return res.status(400).send("El usuario ya existe");
       }
 
-      //Creo un nuevo carrito:
+      // Creo un nuevo carrito:
       const nuevoCarrito = new CartModel();
       await nuevoCarrito.save();
 
@@ -39,11 +40,13 @@ class UserController {
       });
 
       res.redirect("/api/users/profile");
+      logger.info("Usuario registrado correctamente");
     } catch (error) {
-      console.error(error);
+      logger.error("Error al registrar el usuario:", error.message);
       res.status(500).send("Error interno del servidor");
     }
   }
+
   async login(req, res) {
     const { email, password } = req.body;
     try {
@@ -68,8 +71,9 @@ class UserController {
       });
 
       res.redirect("/api/users/profile");
+      logger.info("Usuario autenticado correctamente");
     } catch (error) {
-      console.error(error);
+      logger.error("Error al autenticar el usuario:", error.message);
       res.status(500).send("Error interno del servidor");
     }
   }
@@ -86,8 +90,9 @@ class UserController {
       const isAdmin = req.user.rol === "admin";
 
       res.render("profile", { user: userDto, isAdmin }); // Pasar isAdmin a la vista
+      logger.info("Perfil del usuario obtenido correctamente");
     } catch (error) {
-      console.error("Error al obtener el perfil del usuario", error);
+      logger.error("Error al obtener el perfil del usuario:", error.message);
       res.status(500).send("Error interno del servidor");
     }
   }
@@ -95,8 +100,10 @@ class UserController {
   async logout(req, res) {
     res.clearCookie("coderCookieToken");
     res.redirect("/login");
+    logger.info("Usuario cerró sesión correctamente");
   }
-  //Github
+
+  // Github
   async githubAuth(req, res, next) {
     passport.authenticate("github", { scope: ["user:email"] })(req, res, next);
   }
@@ -116,6 +123,7 @@ class UserController {
           httpOnly: true,
         });
         res.redirect("/api/users/profile");
+        logger.info("Autenticación con GitHub exitosa");
       }
     );
   }

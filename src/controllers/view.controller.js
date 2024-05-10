@@ -1,6 +1,7 @@
 const ProductModel = require("../models/product.model.js");
 const CartRepository = require("../repositories/cart.repository.js");
 const cartRepository = new CartRepository();
+const { logger } = require("../config/logger.config.js"); 
 
 class ViewsController {
   async renderProducts(req, res) {
@@ -36,8 +37,9 @@ class ViewsController {
         totalPages,
         cartId,
       });
+       logger.info("Productos renderizados correctamente"); 
     } catch (error) {
-      console.error("Error al obtener productos", error);
+      logger.error("Error al renderizar los productos:", error.message);
       res.status(500).json({
         status: "error",
         error: "Error interno del servidor",
@@ -105,8 +107,6 @@ class ViewsController {
   async renderHome(req, res) {
     res.render("home");
   }
-
-
 }
 
 module.exports = ViewsController;
